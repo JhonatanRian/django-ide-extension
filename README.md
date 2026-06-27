@@ -5,78 +5,139 @@
 [![Rust](https://img.shields.io/badge/Server-Rust-black.svg?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Write Django templates like you're in PyCharm — but in VS Code.
+Rust-powered LSP server for Django. Autocomplete, view-to-template navigation, N+1 detection, migration analysis.
 
-Context-aware autocomplete, instant view-to-template navigation, N+1 detection, migration safety checks. All backed by a Rust LSP server that doesn't get in your way.
-
-![Demo](assets/202606161731.gif)
+![demo](assets/202606161731.gif)
 
 ---
 
-## Features
+## What it does
 
-### ⚡ Autocomplete That Actually Knows Your Views
+### View-to-template autocomplete
 
-Open a template like `home.html` and the extension already knows which views render it and what context variables they pass. Type `{{` and get your variables. Type `{{ user.` and get `.username`, `.email` — the works.
+If VS Code knows `home.html` is rendered by `HomeView`, autocomplete knows it too. Type `{{` and context variables show up. Type `{{ user.` and you get `.username`, `.email`, etc.
 
-Also completes tags, filters (`|lower`, `|default`), custom `{% load %}` tags, and inclusion tags.
+```python
+# views.py
+class HomeView(TemplateView):
+    template_name = "home.html"
 
-### 🔍 Jump Between Views & Templates
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["posts"] = Post.objects.all()
+        context["categories"] = Category.objects.all()
+        return context
+```
 
-- **Ctrl+Click** a template name in Python — `render(request, "home.html")` — and you're in the HTML file.
-- **Go to View** from any template to find and jump to the Python view that rendered it.
+```django
+{{ posts.  # autocomplete: .all, .count, .exists, Post fields
+{{ categ  # autocomplete: categories (from the view)
+```
 
-### 📚 Hover Docs
+Also completes tags, filters (`{% url %}`, `{% load %}`, `{{ value|date:"Y" }}`), inclusion tags.
 
-Hover over a template variable and see its type, where it came from, and its fields. No more guessing.
+### View ↔ template navigation
 
-### ⚙️ Database & ORM Intelligence
+- Ctrl+Click `render(request, "home.html")` → opens the template.
+- From inside a template, "Go to View" → lists the views that render it.
 
-- Autocomplete for custom managers, `annotate`, `values`, `select_related`, `prefetch_related` — the whole QuerySet API.
-- Field names, Meta options, relationship traversal — all suggested as you type.
-- Migration safety analysis catches risky operations (non-nullable fields, blocking alters) before you run them.
+### Hover
 
-### 🚨 N+1 Detection & Auto-Fix
+Hover a template variable to see its inferred type, origin view, and available fields.
 
-Catches unoptimized queries in querysets, nested loops, `.first()`, `.last()`, `.get()`, and template loop accesses. Suggests quick-fixes that drop `.select_related()` / `.prefetch_related()` right where you need them.
+```django
+{{ user }}  →  User (from home_view)  .username, .email, .date_joined
+```
+
+### ORM
+
+Autocomplete for `annotate`, `values`, `select_related`, `prefetch_related`, custom managers. Navigation between models and fields.
+
+```python
+Post.objects.select_related("author").filter(
+    author__  # autocomplete: username, email, profile, date_joined
+)
+```
+
+### Static N+1 detection
+
+Analyzes code without running it. Catches patterns like:
+
+```python
+for post in Post.objects.all():  # N+1: Post.objects.all() followed by post.author.name
+    print(post.author.name)
+```
+
+Suggests a quick-fix with `.select_related("author")`. Works with `.first()`, `.last()`, `.get()`, nested loops, and template variable access.
+
+It doesn't always get it right. False positives happen — especially when the relation was already loaded earlier or when the access is conditional. Diagnostics emit as warnings, not errors.
+
+### Migration analysis
+
+Scans migration files and flags risky operations:
+
+- Adding a non-nullable field without a default
+- Column changes that can lock tables on MySQL
+- Removing fields that are still referenced
+
+False positives here too. Flagged operations aren't always a problem — depends on table size, database engine, timing. Use your judgment.
 
 ---
 
-## How It Works
+## How it works
 
 ```mermaid
 graph TD
-    VSCode[VS Code client] <-->|LSP| LSP[TS Client /extension.js]
-    LSP <-->|JSON-RPC| Server[Rust LSP Server]
-    Server -->|Parses| Python[Python Views & CBVs]
-    Server -->|Parses| Templates[Django HTML Templates]
+    VSCode[VS Code] <-->|LSP| Client[TS Client]
+    Client <-->|JSON-RPC| Server[Rust LSP]
     Server -->|AST| Ruff[ruff_python_ast]
-    Server -->|Syntax Tree| TS[tree-sitter]
+    Server -->|Tree-sitter| TS[tree-sitter]
 ```
 
-1. **TypeScript Client** — Talks to VS Code, manages workspaces, finds your virtualenv via the MS Python extension.
-2. **Rust LSP Server** — Indexes views, maps routes, resolves CBV hierarchies, parses templates, and runs diagnostics. All in Rust, all fast.
+1. The TypeScript client talks to VS Code, discovers the workspace, and finds the virtualenv (via ms-python).
+2. The Rust server indexes views, maps routes, resolves CBVs, parses templates, and runs diagnostics.
+
+The server runs as a separate process. If it crashes, VS Code restarts it automatically.
 
 ---
 
-## Settings
+## Configuration
+
+```json
+{
+    "djangoIde.templateDirs": ["**/templates"],
+    "djangoIde.pythonExecutable": null,
+    "djangoIde.diagnostics.n1": true,
+    "djangoIde.diagnostics.migrations": true
+}
+```
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `djangoIde.templateDirs` | `string[]` | `["**/templates"]` | Where to look for templates |
-| `djangoIde.pythonExecutable` | `string` | `null` | Custom Python path (falls back to active virtualenv) |
-| `djangoIde.diagnostics.n1` | `boolean` | `true` | Toggle N+1 warnings |
-| `djangoIde.diagnostics.migrations` | `boolean` | `true` | Toggle migration safety checks |
+| `djangoIde.templateDirs` | `string[]` | `["**/templates"]` | Template directories to scan |
+| `djangoIde.pythonExecutable` | `string` | `null` | Path to Python (falls back to active virtualenv) |
+| `djangoIde.diagnostics.n1` | `boolean` | `true` | Enable/disable N+1 detection |
+| `djangoIde.diagnostics.migrations` | `boolean` | `true` | Enable/disable migration analysis |
 
 ---
 
-## Issues & Feedback
+## Current limitations
 
-The core engine is closed-source, but this repo is the public hangout for bug reports, feature requests, and docs.
+- View-to-template autocomplete only works when the view uses `TemplateView`, `render()`, or `render_to_response()`. If context is passed indirectly (middleware, complex mixins), it may not resolve.
+- `{% include %}` resolution is basic. Dynamic includes (with a variable) are not followed.
+- The N+1 detector is static — it doesn't run the code. If the query was already optimized elsewhere in the flow, it still fires.
+- Migration analysis doesn't connect to the database. It only reads migration files.
+- Projects with highly dynamic `urlpatterns` (generated in loops, complex regex) may break view-to-template navigation.
 
-Use the issue tracker for:
-- **Bugs** — autocomplete failing on weird Django patterns? Navigation broken?
-- **Ideas** — stuff you'd want to see in Django + VS Code integration
-- **Crashes** — LSP going boom, memory leaks, performance gripes
+---
+
+## Issues
+
+Use the tracker for:
+- Bugs (autocomplete not working, wrong navigation, crashes)
+- Feature ideas
+- Questions about behavior
+
+The core engine is closed-source, but the tracker is public.
 
 Check [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue.
