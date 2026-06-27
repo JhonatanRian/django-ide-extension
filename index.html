@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django IDE Extension - High-Performance VS Code LSP</title>
+    <meta name="description" content="Bring PyCharm-like productivity to Django templates and Python views inside VS Code with a high-performance Rust-powered Language Server.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Glows -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="header" id="site-header">
+        <div class="container header-container">
+            <div class="logo-area">
+                <span class="logo-text">Django <span class="accent-text">IDE</span></span>
+            </div>
+            <nav class="nav" id="main-nav" aria-label="Main Navigation">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#configuration" class="nav-link">Configuration</a>
+                <a href="https://github.com/django-ide/django-ide-extension" target="_blank" rel="noopener" class="nav-link github-link-header">
+                    <svg viewBox="0 0 24 24" class="github-icon" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <div class="tagline-badge">Now with Static N+1 Query Detection</div>
+                    <h1 class="hero-title">PyCharm-like productivity in VS Code for <span class="gradient-text">Django</span></h1>
+                    <p class="hero-subtitle">
+                        A high-performance, Rust-powered Language Server (LSP) that bridges the gap between Python backend views and HTML Django templates.
+                    </p>
+                    <div class="hero-ctas">
+                        <a href="https://marketplace.visualstudio.com/items?itemName=django-ide.django-ide-extension" class="btn btn-primary" id="cta-install">Install Extension</a>
+                        <a href="https://github.com/django-ide/django-ide-extension" class="btn btn-secondary" id="cta-github">View Source & Issues</a>
+                    </div>
+                </div>
+
+                <!-- Interactive IDE Preview Mockup -->
+                <div class="hero-preview">
+                    <div class="ide-window">
+                        <div class="ide-header">
+                            <div class="dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <div class="ide-title">home.html — django-ide-extension</div>
+                        </div>
+                        <div class="ide-body">
+                            <div class="line-numbers">
+                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                            <pre class="code-editor"><code class="html"><span class="comment">&lt;!-- Django HTML Template --&gt;</span>
+<span class="keyword">{%</span> <span class="tag">extends</span> <span class="string">"base.html"</span> <span class="keyword">%}</span>
+<span class="keyword">{%</span> <span class="tag">block</span> <span class="tag-name">content</span> <span class="keyword">%}</span>
+  <span class="tag">&lt;h1&gt;</span>Welcome back, <span class="variable-container">{{ <span class="variable">user.</span><span class="cursor-block">username</span> }}</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p&gt;</span>Active Projects:<span class="tag">&lt;/p&gt;</span>
+  <span class="keyword">{%</span> <span class="tag">for</span> project <span class="tag">in</span> <span class="variable">projects</span> <span class="keyword">%}</span>
+  ...</code></pre>
+                            <!-- Autocomplete Dropdown overlay -->
+                            <div class="autocomplete-overlay" id="hero-autocomplete">
+                                <div class="autocomplete-item active"><span class="ac-icon">v</span> username <span class="ac-type">string</span></div>
+                                <div class="autocomplete-item"><span class="ac-icon">v</span> email <span class="ac-type">string</span></div>
+                                <div class="autocomplete-item"><span class="ac-icon">v</span> get_full_name <span class="ac-type">method</span></div>
+                                <div class="autocomplete-item"><span class="ac-icon">v</span> is_authenticated <span class="ac-type">boolean</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Everything you need for Django</h2>
+                    <p class="section-subtitle">A seamless developer experience connecting your frontend templates to your backend code.</p>
+                </div>
+
+                <div class="features-interactive">
+                    <div class="features-tabs-list" role="tablist" aria-label="Feature Tabs">
+                        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-autocomplete" id="tab-autocomplete">
+                            <span class="tab-title">Smart Autocomplete</span>
+                            <span class="tab-desc">Context-aware Django template autocompletions.</span>
+                        </button>
+                        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-navigation" id="tab-navigation">
+                            <span class="tab-title">Instant Navigation</span>
+                            <span class="tab-desc">Jump between views and templates seamlessly.</span>
+                        </button>
+                        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-db" id="tab-db">
+                            <span class="tab-title">Database & ORM Intelligence</span>
+                            <span class="tab-desc">Completions for custom QuerySets & migrations security.</span>
+                        </button>
+                        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-n1" id="tab-n1">
+                            <span class="tab-title">Static N+1 Query Detection</span>
+                            <span class="tab-desc">Detect database roundtrips directly in your IDE.</span>
+                        </button>
+                    </div>
+
+                    <div class="features-panels">
+                        <!-- Panel 1: Autocomplete -->
+                        <div class="tab-panel active" id="panel-autocomplete" role="tabpanel" aria-labelledby="tab-autocomplete">
+                            <div class="panel-showcase">
+                                <div class="panel-desc">
+                                    <h3>Intelligent Context Auto-completion</h3>
+                                    <p>The extension maps views to their respective templates statically. When you open a template, it parses the view function or class-based view (CBV) that renders it and extracts context variables in real time.</p>
+                                    <ul class="feature-bullets">
+                                        <li>Deep model field inspection (e.g. nested objects).</li>
+                                        <li>Built-in tags and standard Django filters.</li>
+                                        <li>Custom filter resolution from <code>{% load %}</code>.</li>
+                                    </ul>
+                                </div>
+                                <div class="panel-ide">
+                                    <div class="ide-window">
+                                        <div class="ide-header">
+                                            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                                            <span class="title">template_details.html</span>
+                                        </div>
+                                        <div class="ide-body">
+                                            <pre><code><span class="comment">&lt;!-- Autocomplete on context objects --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"profile"</span><span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;h2&gt;</span><span class="variable-container">{{ user.<span class="cursor-block">p</span> }}</span><span class="tag">&lt;/h2&gt;</span></code></pre>
+                                            <div class="autocomplete-overlay sub-overlay">
+                                                <div class="autocomplete-item active"><span class="ac-icon">v</span> profile <span class="ac-type">UserProfile</span></div>
+                                                <div class="autocomplete-item"><span class="ac-icon">v</span> password <span class="ac-type">string</span></div>
+                                                <div class="autocomplete-item"><span class="ac-icon">v</span> pk <span class="ac-type">integer</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Navigation -->
+                        <div class="tab-panel" id="panel-navigation" role="tabpanel" aria-labelledby="tab-navigation" hidden>
+                            <div class="panel-showcase">
+                                <div class="panel-desc">
+                                    <h3>Instant View-to-Template Navigation</h3>
+                                    <p>Eliminate folder exploration friction. The LSP sets up bidirectional links between code references and layouts, enabling direct hyperlinking.</p>
+                                    <ul class="feature-bullets">
+                                        <li><strong>Go to Template:</strong> <code>Ctrl + Click</code> on a layout path string inside Python code to open it.</li>
+                                        <li><strong>Go to View:</strong> Hit <code>Django: Go to View</code> command to jump back to any Python functions rendering your template.</li>
+                                    </ul>
+                                </div>
+                                <div class="panel-ide">
+                                    <div class="ide-window">
+                                        <div class="ide-header">
+                                            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                                            <span class="title">views.py</span>
+                                        </div>
+                                        <div class="ide-body">
+                                            <pre><code><span class="keyword">def</span> <span class="function">dashboard</span>(request):
+    <span class="keyword">return</span> render(
+        request, 
+        <span class="navigation-link"><span class="string">"dashboard/main.html"</span></span>, <span class="comment"># Ctrl+Click to follow</span>
+        {<span class="string">"data"</span>: get_stats()}
+    )</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: DB & ORM -->
+                        <div class="tab-panel" id="panel-db" role="tabpanel" aria-labelledby="tab-db" hidden>
+                            <div class="panel-showcase">
+                                <div class="panel-desc">
+                                    <h3>Database & ORM Intelligence</h3>
+                                    <p>Write robust Django ORM queries with immediate feedback. The LSP indexes your models, querysets, managers, and migrations files to offer custom-tailored database capabilities.</p>
+                                    <ul class="feature-bullets">
+                                        <li>Suggestions for custom Managers, QuerySets methods, and <code>F</code> / <code>Q</code> expressions.</li>
+                                        <li>Risk assessment analyzer for migrations, preventing production locks or schema corruption.</li>
+                                        <li>Dynamic fields traversal completion.</li>
+                                    </ul>
+                                </div>
+                                <div class="panel-ide">
+                                    <div class="ide-window">
+                                        <div class="ide-header">
+                                            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                                            <span class="title">models.py</span>
+                                        </div>
+                                        <div class="ide-body">
+                                            <pre><code><span class="comment"># Completions on QuerySets</span>
+projects = Project.objects.filter(
+    active=True
+).<span class="cursor-block">s</span></code></pre>
+                                            <div class="autocomplete-overlay sub-overlay">
+                                                <div class="autocomplete-item active"><span class="ac-icon">f</span> select_related <span class="ac-type">QuerySet</span></div>
+                                                <div class="autocomplete-item"><span class="ac-icon">f</span> prefetch_related <span class="ac-type">QuerySet</span></div>
+                                                <div class="autocomplete-item"><span class="ac-icon">f</span> stddev <span class="ac-type">QuerySet</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: N+1 Detection -->
+                        <div class="tab-panel" id="panel-n1" role="tabpanel" aria-labelledby="tab-n1" hidden>
+                            <div class="panel-showcase">
+                                <div class="panel-desc">
+                                    <h3>Static N+1 Query Prevention</h3>
+                                    <p>Prevent severe database lag before running server migrations. The static inspector flags potential N+1 database roundtrips occurring during loops inside templates and python views.</p>
+                                    <ul class="feature-bullets">
+                                        <li>Identifies loop variables fetching database relations inside HTML templates.</li>
+                                        <li>Flags nested view loops resolving models' relations.</li>
+                                        <li>Provides IDE Quick-Fix Actions to add <code>select_related()</code> or <code>prefetch_related()</code>.</li>
+                                    </ul>
+                                </div>
+                                <div class="panel-ide">
+                                    <div class="ide-window">
+                                        <div class="ide-header">
+                                            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                                            <span class="title">views.py</span>
+                                        </div>
+                                        <div class="ide-body">
+                                            <pre><code><span class="keyword">for</span> project <span class="keyword">in</span> Project.objects.all():
+    <span class="comment"># Diagnostic alert: N+1 query detected!</span>
+    <span class="diagnostic-error">print(project.owner.profile.bio)</span></code></pre>
+                                            <div class="diagnostic-hover">
+                                                <div class="hover-header">⚠️ Django Diagnostic (N+1 Query)</div>
+                                                <div class="hover-body">Accessing 'project.owner' inside a loop causes an N+1 query.</div>
+                                                <div class="hover-footer"><a href="#" class="quick-fix-btn">💡 Quick Fix: Add select_related('owner')</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section class="architecture-section" id="architecture">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Built for Speed and Safety</h2>
+                    <p class="section-subtitle">Combining a lightweight TypeScript Client with a blazing-fast Rust Language Server.</p>
+                </div>
+
+                <div class="arch-grid">
+                    <div class="arch-card">
+                        <div class="card-icon">🦀</div>
+                        <h3>Rust Language Server (LSP)</h3>
+                        <p>Written from scratch in Rust, the LSP parser consumes sub-millisecond parsing times. It utilizes highly optimized AST indexing and multithreaded caching so your IDE remains lightning fast.</p>
+                    </div>
+                    <div class="arch-card">
+                        <div class="card-icon">🌲</div>
+                        <h3>Tree-sitter Parsing</h3>
+                        <p>Uses tree-sitter grammars to parse both HTML and Python files reliably, tracking accurate scope definitions, context variables, template block bindings, and import mappings.</p>
+                    </div>
+                    <div class="arch-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Ruff AST Integration</h3>
+                        <p>Integrates with <code>ruff_python_ast</code> to efficiently resolve Python syntax trees, ensuring typing patterns, functions returns, context dictionaries, and Class-Based View inheritance are accurately evaluated.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration Settings -->
+        <section class="config-section" id="configuration">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Tailor it to your project</h2>
+                    <p class="section-subtitle">Configure settings directly inside your standard VS Code <code>settings.json</code>.</p>
+                </div>
+
+                <div class="config-table-container">
+                    <table class="config-table">
+                        <thead>
+                            <tr>
+                                <th>Setting ID</th>
+                                <th>Type</th>
+                                <th>Default</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code class="settings-code">djangoIde.templateDirs</code></td>
+                                <td><span class="type-badge array">string[]</span></td>
+                                <td><code>["**/templates"]</code></td>
+                                <td>A list of glob patterns to search for template folders when scanning.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="settings-code">djangoIde.pythonExecutable</code></td>
+                                <td><span class="type-badge string">string</span></td>
+                                <td><code>null</code></td>
+                                <td>Path to a custom python interpreter if active virtualenv is not resolved automatically.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="settings-code">djangoIde.diagnostics.n1</code></td>
+                                <td><span class="type-badge boolean">boolean</span></td>
+                                <td><code>true</code></td>
+                                <td>Toggle the static N+1 database Query checker warnings.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="settings-code">djangoIde.diagnostics.migrations</code></td>
+                                <td><span class="type-badge boolean">boolean</span></td>
+                                <td><code>true</code></td>
+                                <td>Toggle static risk and safety reviews on migration files.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <p>&copy; 2026 Django IDE Extension. Open Source under the MIT License.</p>
+            <div class="footer-links">
+                <a href="https://github.com/django-ide/django-ide-extension" target="_blank" rel="noopener">GitHub Project</a>
+                <a href="https://github.com/django-ide/django-ide-extension/issues" target="_blank" rel="noopener">Issues Tracker</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>
